@@ -10,10 +10,10 @@ import Routes from './routes';
 const App: React.FC = () => (
   <Router>
     <AppProvider>
-      <Routes/>
+      <Routes />
     </AppProvider>
 
-    <GlobalStyle/>
+    <GlobalStyle />
   </Router>
 );
 
