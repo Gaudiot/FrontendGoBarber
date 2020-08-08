@@ -2,13 +2,13 @@ import React, { useCallback, useRef, useContext, useState } from 'react';
 import * as Yup from 'yup';
 import { Link } from 'react-router-dom';
 
-import { FiLogIn, FiMail } from 'react-icons/fi'
+import { FiLogIn, FiMail } from 'react-icons/fi';
 import { Form } from '@unform/web';
 import { FormHandles } from '@unform/core';
 
 import logoImg from '../../assets/logo.svg';
-import Button from '../../Components/Button'
-import Input from '../../Components/Input'
+import Button from '../../Components/Button';
+import Input from '../../Components/Input';
 import { useToast } from '../../hooks/toast';
 import getValidationErrors from '../../utils/getValidationErrors';
 
@@ -26,50 +26,57 @@ const ForgotPassword: React.FC = () => {
 
   const { addToast } = useToast();
 
-  const handleSubmit = useCallback(async (data: ForgotPasswordFormData) => {
-    try{
-      setLoading(true);
-      formRef.current?.setErrors({});
+  const handleSubmit = useCallback(
+    async (data: ForgotPasswordFormData) => {
+      try {
+        setLoading(true);
+        formRef.current?.setErrors({});
 
-      const schema = Yup.object().shape({
-        email: Yup.string().required('E-mail obrigatório').email('Digite um e-mail válido'),
-      });
+        const schema = Yup.object().shape({
+          email: Yup.string()
+            .required('E-mail obrigatório')
+            .email('Digite um e-mail válido'),
+        });
 
-      await schema.validate(data, {
-        abortEarly: false,
-      });
+        await schema.validate(data, {
+          abortEarly: false,
+        });
 
-      // Recuperação de senha
+        // Recuperação de senha
 
-      await api.post('/password/forgot', { email: data.email })
+        await api.post('/password/forgot', { email: data.email });
 
-      addToast({
-        type: 'success',
-        title: 'E-mail de recuperação enviado',
-        description: 'Enviamos um e-mail para confirmar a recuperação de senha, cheque sua caixa de entrada'
-      });
+        addToast({
+          type: 'success',
+          title: 'E-mail de recuperação enviado',
+          description:
+            'Enviamos um e-mail para confirmar a recuperação de senha, cheque sua caixa de entrada',
+        });
 
-      // await history.push('/dashboard');
-    }catch(err){
-      if (err instanceof Yup.ValidationError){
-        const errors = getValidationErrors(err);
+        // await history.push('/dashboard');
+      } catch (err) {
+        if (err instanceof Yup.ValidationError) {
+          const errors = getValidationErrors(err);
 
-        formRef.current?.setErrors(errors);
+          formRef.current?.setErrors(errors);
 
-        return;
+          return;
+        }
+
+        addToast({
+          type: 'error',
+          title: 'Erro na recuperação de senha',
+          description:
+            'Ocorreu um erro ao tentar realizar a recuperação de senha, tente novamente.',
+        });
+      } finally {
+        setLoading(false);
       }
+    },
+    [addToast],
+  );
 
-      addToast({
-        type: 'error',
-        title: 'Erro na recuperação de senha',
-        description: 'Ocorreu um erro ao tentar realizar a recuperação de senha, tente novamente.',
-      });
-    }finally{
-      setLoading(false);
-    }
-  }, [addToast]);
-
-  return(
+  return (
     <Container>
       <Content>
         <AnimationContainer>
@@ -78,9 +85,11 @@ const ForgotPassword: React.FC = () => {
           <Form ref={formRef} onSubmit={handleSubmit}>
             <h1>Recuperar senha</h1>
 
-            <Input icon={FiMail} name="email" placeholder="E-mail"/>
+            <Input icon={FiMail} name="email" placeholder="E-mail" />
 
-            <Button type="submit">Recuperar</Button>
+            <Button loading={loading} type="submit">
+              Recuperar
+            </Button>
           </Form>
 
           <Link to="/signin">
@@ -89,7 +98,7 @@ const ForgotPassword: React.FC = () => {
           </Link>
         </AnimationContainer>
       </Content>
-      <Background/>
+      <Background />
     </Container>
   );
 };
